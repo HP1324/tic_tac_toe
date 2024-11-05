@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class TicTacToe extends StatelessWidget {
@@ -26,13 +28,16 @@ class _GameScreenState extends State<GameScreen> {
   bool xTurn = true;
   String x = 'X';
   String o = 'O';
+  int inputCount = 0;
+  String winner = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('TicTacToe')),
       body: Column(
         children: [
-          Expanded(
+          SizedBox(
+            height: 400,
             child: GridView(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -42,15 +47,21 @@ class _GameScreenState extends State<GameScreen> {
               children: List<InkWell>.generate(9, (index) {
                 return InkWell(
                   onTap: () {
-                    // debugPrint('is empty${texts[index].isEmpty}');
+
                     setState(() {
-                      if (texts[index].isEmpty) {
+                      if (texts[index].isEmpty && winner.isEmpty) {
                         if (xTurn) {
                           texts[index] = x;
                           xTurn = false;
                         } else {
                           texts[index] = o;
                           xTurn = true;
+                        }
+                        ++inputCount;
+                        winner = getWinner();
+                        log('This is winner $winner');
+                        if (winner.isNotEmpty) {
+                          Future.delayed(const Duration(seconds: 1), () => resetGame());
                         }
                         print(texts);
                       }
@@ -72,16 +83,30 @@ class _GameScreenState extends State<GameScreen> {
               }),
             ),
           ),
-          Container(
-            child: Text('this is'),
-          )
+          if (winner.isNotEmpty)
+            Text(
+              '$winner Wins',
+              style: TextStyle(fontSize: 30, color: darkPink, fontWeight: FontWeight.bold),
+            ),
+          FilledButton(
+              onPressed: () {
+                resetGame();
+              },
+              style: FilledButton.styleFrom(
+                  backgroundColor: darkPink,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  padding: EdgeInsets.symmetric(horizontal: 22, vertical: 6)),
+              child: Text('Play Again',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))
         ],
       ),
     );
   }
 
+
   String getWinner() {
     if (isSame(texts[0], texts[1], texts[2])) {
+      log('inside working condition');
       return texts[0];
     } else if (isSame(texts[3], texts[4], texts[5])) {
       return texts[3];
@@ -102,6 +127,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   bool isSame(String first, String second, String third) {
-    return first == second && second == third;
+    if(first.isNotEmpty && second.isNotEmpty && third.isNotEmpty) {
+      return first == second && second == third;
+    }
+    return false;
+  }
+
+  void resetGame() {
+    setState(() {
+     texts= ['', '', '', '', '', '', '', '', ''];
+      winner = '';
+      print(winner.isEmpty);
+    });
   }
 }
