@@ -50,13 +50,8 @@ class _GameScreenState extends State<GameScreen> {
 
                     setState(() {
                       if (texts[index].isEmpty && winner.isEmpty) {
-                        if (xTurn) {
-                          texts[index] = x;
-                          xTurn = false;
-                        } else {
-                          texts[index] = o;
-                          xTurn = true;
-                        }
+                        texts[index] = xTurn ? x :o;
+                        xTurn = !xTurn;
                         ++inputCount;
                         winner = getWinner();
                         log('This is winner $winner');
@@ -89,9 +84,7 @@ class _GameScreenState extends State<GameScreen> {
               style: TextStyle(fontSize: 30, color: darkPink, fontWeight: FontWeight.bold),
             ),
           FilledButton(
-              onPressed: () {
-                resetGame();
-              },
+              onPressed:resetGame,
               style: FilledButton.styleFrom(
                   backgroundColor: darkPink,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
